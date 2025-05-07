@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** PANORAMIX
 ** File description:
-** Utils
+** tout est dans le nom ma biche
 */
 
 #include "pano.h"
@@ -42,7 +42,7 @@ int parse_arguments(int argc, char **argv, panoramix_t *data)
     }
 
     data->nb_gitouze = atoi(argv[1]);
-    data->huit_six = atoi(argv[2]);
+    data->huit_six = atoi(argv[2]);  // pot size (haha)
     data->nb_fights = atoi(argv[3]);
     data->nb_refills = atoi(argv[4]);
 
@@ -55,10 +55,10 @@ int parse_arguments(int argc, char **argv, panoramix_t *data)
 
 static int init_mutexes(panoramix_t *data)
 {
-    if (pthread_mutex_init(&data->pot_mutex, NULL) != 0)
+    if (pthread_mutex_init(&data->marmite_mutex, NULL) != 0)
         return 0;
     if (pthread_mutex_init(&data->print_mutex, NULL) != 0) {
-        pthread_mutex_destroy(&data->pot_mutex);
+        pthread_mutex_destroy(&data->marmite_mutex);
         return 0;
     }
     return 1;
@@ -66,16 +66,15 @@ static int init_mutexes(panoramix_t *data)
 
 static int init_semaphores(panoramix_t *data)
 {
-    if (sem_init(&data->druid_sem, 0, 0) != 0) {
-        pthread_mutex_destroy(&data->pot_mutex);
+    if (sem_init(&data->snore_sem, 0, 0) != 0) {
+        pthread_mutex_destroy(&data->marmite_mutex);
         pthread_mutex_destroy(&data->print_mutex);
         return 0;
     }
-
     if (sem_init(&data->pot_refilled_sem, 0, 0) != 0) {
-        pthread_mutex_destroy(&data->pot_mutex);
+        pthread_mutex_destroy(&data->marmite_mutex);
         pthread_mutex_destroy(&data->print_mutex);
-        sem_destroy(&data->druid_sem);
+        sem_destroy(&data->snore_sem);
         return 0;
     }
 
@@ -84,53 +83,48 @@ static int init_semaphores(panoramix_t *data)
 
 static int init_barrier(panoramix_t *data)
 {
-    // Initialize barrier with villagers + druid + 1 (for main thread if needed)
     if (pthread_barrier_init(&data->barrier, NULL, data->nb_gitouze + 1) != 0) {
-        pthread_mutex_destroy(&data->pot_mutex);
+        pthread_mutex_destroy(&data->marmite_mutex);
         pthread_mutex_destroy(&data->print_mutex);
-        sem_destroy(&data->druid_sem);
+        sem_destroy(&data->snore_sem);
         sem_destroy(&data->pot_refilled_sem);
         return 0;
     }
-
     return 1;
 }
 
-static int init_gitouze_fights(panoramix_t *data)
+static int init_zonzon_fights(panoramix_t *data)
 {
-    data->gitouze_fights_left = malloc(sizeof(int) * data->nb_gitouze);
+    data->zonzon_fights_left = malloc(sizeof(int) * data->nb_gitouze);
 
-    if (data->gitouze_fights_left == NULL) {
-        pthread_mutex_destroy(&data->pot_mutex);
+    if (data->zonzon_fights_left == NULL) {
+        pthread_mutex_destroy(&data->marmite_mutex);
         pthread_mutex_destroy(&data->print_mutex);
-        sem_destroy(&data->druid_sem);
+        sem_destroy(&data->snore_sem);
         sem_destroy(&data->pot_refilled_sem);
         pthread_barrier_destroy(&data->barrier);
         return 0;
     }
 
     for (int i = 0; i < data->nb_gitouze; i++)
-        data->gitouze_fights_left[i] = data->nb_fights;
+        data->zonzon_fights_left[i] = data->nb_fights;
     return 1;
 }
 
 int initialize_data(panoramix_t *data)
 {
-    data->current_pot_servings = data->huit_six;
-    data->remaining_refills = data->nb_refills;
-    data->all_gitouze_done = 0;
+    data->bouillon_left = data->huit_six;
+    data->ingredients_left = data->nb_refills;
+    data->all_zonzons_done = 0;
     data->druid_is_awake = 0;
 
     if (!init_mutexes(data))
         return 0;
-
     if (!init_semaphores(data))
         return 0;
-
     if (!init_barrier(data))
         return 0;
-
-    if (!init_gitouze_fights(data))
+    if (!init_zonzon_fights(data))
         return 0;
 
     return 1;
@@ -138,12 +132,10 @@ int initialize_data(panoramix_t *data)
 
 void cleanup_resources(panoramix_t *data)
 {
-    pthread_mutex_destroy(&data->pot_mutex);
+    pthread_mutex_destroy(&data->marmite_mutex);
     pthread_mutex_destroy(&data->print_mutex);
-
-    sem_destroy(&data->druid_sem);
+    sem_destroy(&data->snore_sem);
     sem_destroy(&data->pot_refilled_sem);
     pthread_barrier_destroy(&data->barrier);
-
-    free(data->gitouze_fights_left);
+    free(data->zonzon_fights_left);
 }

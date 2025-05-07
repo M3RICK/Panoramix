@@ -10,9 +10,10 @@ NAME	= panoramix
 CC	= gcc
 RM	= rm -f
 
-SRCS	= 	src/main.c	\
+SRCS	= 	src/main.c				\
 		  	src/threads_handler.c	\
-			  src/tools.c
+			src/tools.c				\
+			src/thread_extensions.c
 OBJS	= $(SRCS:.c=.o)
 
 CFLAGS	= -Wall -Wextra -Werror -pthread
