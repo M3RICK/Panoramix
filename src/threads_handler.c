@@ -21,7 +21,7 @@ int get_serving(panoramix_t *data, int zonzon_id)
     int success = 0;
 
     pthread_mutex_lock(&data->marmite_mutex);
-    print_message(data, "Villager %d: I need a drink... I see %d servings left.\n",
+    msg(data, "Villager %d: I need a drink... I see %d servings left.\n",
         zonzon_id, data->bouillon_left);
     if (data->bouillon_left > 0) {
         data->bouillon_left--;
@@ -39,7 +39,7 @@ void wake_druid(panoramix_t *data, int zonzon_id)
     if (!data->druid_is_awake && data->ingredients_left > 0) {
         should_wake = 1;
         data->druid_is_awake = 1;
-        print_message(data, "Villager %d: Hey Pano wake up! We need more potion.\n",
+        msg(data, "Villager %d: Hey Pano wake up! We need more potion.\n",
             zonzon_id);
     }
     pthread_mutex_unlock(&data->marmite_mutex);
@@ -50,14 +50,14 @@ void wake_druid(panoramix_t *data, int zonzon_id)
 
 void fight_romans(panoramix_t *data, int zonzon_id, int *fights_left)
 {
-    print_message(data, "Villager %d: Take that roman scum! Only %d left.\n",
+    msg(data, "Villager %d: Take that roman scum! Only %d left.\n",
                 zonzon_id, *fights_left - 1);
     (*fights_left)--;
 }
 
 void handle_zonzon_exit(panoramix_t *data, int zonzon_id, thread_arg_t *arg)
 {
-    print_message(data, "Villager %d: I'm going to sleep now.\n", zonzon_id);
+    msg(data, "Villager %d: I'm going to sleep now.\n", zonzon_id);
     pthread_mutex_lock(&data->marmite_mutex);
     data->zonzon_fights_left[zonzon_id] = 0;
     if (check_all_zonzons_done(data)) {

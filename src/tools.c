@@ -7,7 +7,7 @@
 
 #include "pano.h"
 
-void print_message(panoramix_t *data, const char *format, ...)
+void msg(panoramix_t *data, const char *format, ...)
 {
     va_list args;
 
@@ -40,12 +40,10 @@ int parse_arguments(int argc, char **argv, panoramix_t *data)
         display_usage(argv[0]);
         return 0;
     }
-
     data->nb_gitouze = atoi(argv[1]);
-    data->huit_six = atoi(argv[2]);  // pot size (haha)
+    data->huit_six = atoi(argv[2]);
     data->nb_fights = atoi(argv[3]);
     data->nb_refills = atoi(argv[4]);
-
     if (!check_arguments(data)) {
         display_usage(argv[0]);
         return 0;
@@ -77,13 +75,13 @@ static int init_semaphores(panoramix_t *data)
         sem_destroy(&data->snore_sem);
         return 0;
     }
-
     return 1;
 }
 
 static int init_barrier(panoramix_t *data)
 {
-    if (pthread_barrier_init(&data->barrier, NULL, data->nb_gitouze + 1) != 0) {
+    if (pthread_barrier_init(&data->barrier, NULL,
+        data->nb_gitouze + 1) != 0) {
         pthread_mutex_destroy(&data->marmite_mutex);
         pthread_mutex_destroy(&data->print_mutex);
         sem_destroy(&data->snore_sem);
@@ -96,7 +94,6 @@ static int init_barrier(panoramix_t *data)
 static int init_zonzon_fights(panoramix_t *data)
 {
     data->zonzon_fights_left = malloc(sizeof(int) * data->nb_gitouze);
-
     if (data->zonzon_fights_left == NULL) {
         pthread_mutex_destroy(&data->marmite_mutex);
         pthread_mutex_destroy(&data->print_mutex);
@@ -105,7 +102,6 @@ static int init_zonzon_fights(panoramix_t *data)
         pthread_barrier_destroy(&data->barrier);
         return 0;
     }
-
     for (int i = 0; i < data->nb_gitouze; i++)
         data->zonzon_fights_left[i] = data->nb_fights;
     return 1;
@@ -117,7 +113,6 @@ int initialize_data(panoramix_t *data)
     data->ingredients_left = data->nb_refills;
     data->all_zonzons_done = 0;
     data->druid_is_awake = 0;
-
     if (!init_mutexes(data))
         return 0;
     if (!init_semaphores(data))
@@ -126,7 +121,6 @@ int initialize_data(panoramix_t *data)
         return 0;
     if (!init_zonzon_fights(data))
         return 0;
-
     return 1;
 }
 

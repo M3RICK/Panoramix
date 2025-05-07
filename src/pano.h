@@ -41,7 +41,7 @@ typedef struct thread_arg_s {
 void *zonzon_thread(void *arg);
 void *pano_thread(void *arg);
 
-void print_message(panoramix_t *data, const char *format, ...);
+void msg(panoramix_t *data, const char *format, ...);
 int parse_arguments(int argc, char **argv, panoramix_t *data);
 int initialize_data(panoramix_t *data);
 void cleanup_resources(panoramix_t *data);

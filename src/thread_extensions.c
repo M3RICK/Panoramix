@@ -19,16 +19,15 @@ int should_druid_exit(panoramix_t *data)
 
 void refill_potion(panoramix_t *data)
 {
-    print_message(data,
+    msg(data,
         "Druid: Ah! Yes, yes, I'm awake! Working on it! "
         "Beware I can only make %d more refills after this one.\n",
         data->ingredients_left - 1);
-
     pthread_mutex_lock(&data->marmite_mutex);
     data->bouillon_left = data->huit_six;
     data->ingredients_left--;
     if (data->ingredients_left == 0)
-        print_message(data, "Druid: I'm out of viscum. I'm going back to... zZz\n");
+        msg(data, "Druid: I'm out of viscum. I'm going back to... zZz\n");
     data->druid_is_awake = 0;
     pthread_mutex_unlock(&data->marmite_mutex);
     for (int i = 0; i < data->nb_gitouze; i++)
@@ -39,7 +38,7 @@ void *pano_thread(void *arg)
 {
     panoramix_t *data = (panoramix_t *)arg;
 
-    print_message(data, "Druid: I'm ready... but sleepy...\n");
+    msg(data, "Druid: I'm ready... but sleepy...\n");
     pthread_barrier_wait(&data->barrier);
     while (1) {
         sem_wait(&data->snore_sem);
@@ -58,7 +57,7 @@ void *zonzon_thread(void *arg)
     int fights_left = data->nb_fights;
 
     pthread_barrier_wait(&data->barrier);
-    print_message(data, "Villager %d: Going into battle!\n", zonzon_id);
+    msg(data, "Villager %d: Going into battle!\n", zonzon_id);
     usleep(5);
     while (fights_left > 0) {
         if (get_serving(data, zonzon_id)) {
