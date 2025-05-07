@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** PANORAMIX
 ** File description:
-** Utilis
+** Utils
 */
 
 #include "pano.h"
@@ -71,12 +71,28 @@ static int init_semaphores(panoramix_t *data)
         pthread_mutex_destroy(&data->print_mutex);
         return 0;
     }
+
     if (sem_init(&data->pot_refilled_sem, 0, 0) != 0) {
         pthread_mutex_destroy(&data->pot_mutex);
         pthread_mutex_destroy(&data->print_mutex);
         sem_destroy(&data->druid_sem);
         return 0;
     }
+
+    return 1;
+}
+
+static int init_barrier(panoramix_t *data)
+{
+    // Initialize barrier with villagers + druid + 1 (for main thread if needed)
+    if (pthread_barrier_init(&data->barrier, NULL, data->nb_gitouze + 1) != 0) {
+        pthread_mutex_destroy(&data->pot_mutex);
+        pthread_mutex_destroy(&data->print_mutex);
+        sem_destroy(&data->druid_sem);
+        sem_destroy(&data->pot_refilled_sem);
+        return 0;
+    }
+
     return 1;
 }
 
@@ -89,6 +105,7 @@ static int init_gitouze_fights(panoramix_t *data)
         pthread_mutex_destroy(&data->print_mutex);
         sem_destroy(&data->druid_sem);
         sem_destroy(&data->pot_refilled_sem);
+        pthread_barrier_destroy(&data->barrier);
         return 0;
     }
 
@@ -102,11 +119,15 @@ int initialize_data(panoramix_t *data)
     data->current_pot_servings = data->huit_six;
     data->remaining_refills = data->nb_refills;
     data->all_gitouze_done = 0;
+    data->druid_is_awake = 0;
 
     if (!init_mutexes(data))
         return 0;
 
     if (!init_semaphores(data))
+        return 0;
+
+    if (!init_barrier(data))
         return 0;
 
     if (!init_gitouze_fights(data))
@@ -122,6 +143,7 @@ void cleanup_resources(panoramix_t *data)
 
     sem_destroy(&data->druid_sem);
     sem_destroy(&data->pot_refilled_sem);
+    pthread_barrier_destroy(&data->barrier);
 
     free(data->gitouze_fights_left);
 }

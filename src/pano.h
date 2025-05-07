@@ -26,17 +26,17 @@ typedef struct {
     int all_gitouze_done;
     pthread_mutex_t pot_mutex;
     pthread_mutex_t print_mutex;
-    sem_t druid_sem;
-    sem_t pot_refilled_sem;
+    pthread_barrier_t barrier;       // Barrier for synchronizing thread starts
+    sem_t druid_sem;                 // Semaphore for waking the druid
+    sem_t pot_refilled_sem;          // Semaphore for signaling pot refill
+    int druid_is_awake;              // Flag to track if druid is already being woken
     int *gitouze_fights_left;
 } panoramix_t;
-
 
 typedef struct thread_arg_s {
     int id;
     panoramix_t *data;
 } thread_arg_t;
-
 
 void *gitouze_thread(void *arg);
 void *druid_thread(void *arg);
